@@ -93,8 +93,15 @@ print("Welcome, " + alias + ".")
 print("System started.")
 print("")
 
-user_file = open("user.txt", "r")
-username = user_file.read()
+import os
+
+if not os.path.exists("user.txt"):
+    user_file = open("user.txt", "w", encoding="utf-8")
+    user_file.write("dana_maestas")
+    user_file.close()
+
+user_file = open("user.txt", "r", encoding="utf-8")
+username = user_file.read().strip()
 user_file.close()
 
 
