@@ -1,0 +1,11 @@
+# Local DedSec settings
+user.txt
+selected_art.txt
+
+# Python temporary files
+__pycache__/
+*.pyc
+
+# Windows junk
+Thumbs.db
+desktop.ini
