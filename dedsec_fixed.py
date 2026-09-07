@@ -200,7 +200,44 @@ while True:
             for name, pid, memory_kb in processes:
                 memory_mb = memory_kb / 1024
                 print(f"[PROC] {name:<25} PID: {pid:<8} RAM: {memory_mb:.1f} MB")
+                
+        elif parts[1] == "net":
+            print("DEDSEC // NETWORK SCAN")
+            print("[+] Scanning active network connections...")
+            print("-" * 80)
 
+            net_result = subprocess.run(
+                ["netstat", "-ano"],
+                capture_output=True,
+                text=True,
+                encoding="cp866",
+                errors="ignore"
+            )
+
+            net_lines = net_result.stdout.splitlines()
+
+            for line in net_lines:
+                line = line.strip()
+
+                if line.startswith("TCP"):
+                    columns = line.split()
+
+                    if len(columns) >= 5:
+                        protocol = columns[0]
+                        local_address = columns[1]
+                        remote_address = columns[2]
+                        state = columns[3]
+                        pid = columns[4]
+
+                    if state == "ESTABLISHED":
+                        print(
+                            f"[NET] {protocol:<5} "
+                            f"PID: {pid:<7} "
+                            f"STATE: {state}"
+                        )
+                        print(f"      LOCAL:  {local_address}")
+                        print(f"      REMOTE: {remote_address}")
+                        print("-" * 80)
         else:
             search_name = parts[1]
 
