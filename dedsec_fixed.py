@@ -1,6 +1,6 @@
 import os
 import time
-
+import csv
 os.system("color 0F")
 
 def center_text(text):
@@ -123,36 +123,123 @@ while True:
         print("setname - change username")
         print("showname - show current username")
         print("change - art")
+        print("dedsec//scan")
+         
+    elif command.startswith("scan"):
+        print("DEDSEC // SCAN")
+        print("[+] Scanning running processes...")
+
+        import subprocess
+
+        result = subprocess.run(
+            ["tasklist", "/FO", "CSV", "/NH"],
+            capture_output=True,
+            text=True,
+            encoding="cp866",
+            errors="ignore"
+    )
+
+        lines = result.stdout.splitlines()
+
+        print("[+] PROCESS SCAN COMPLETE")
+        print(f"[+] FOUND: {len(lines)} PROCESSES")
+        print("-" * 60)
+
+        reader = csv.reader(lines)
+
+        processes = []
+
+        for row in reader:
+            name = row[0]
+            pid = row[1]
+            memory_text = row[4]
+
+            memory_number = (
+                memory_text
+                .replace("КБ", "")
+                .replace("KB", "")
+                .replace("\xa0", "")
+                .replace(" ", "")
+           )
+
+            if memory_number.isdigit():
+                memory_kb = int(memory_number)
+            else:
+                memory_kb = 0
+
+            processes.append((name, pid, memory_kb))
+
+        processes.sort(key=lambda process: process[2], reverse=True)
+
+        print("[+] TOP RAM PROCESSES")
+        print("-" * 60)
+
+        for name, pid, memory_kb in processes[:10]:
+            memory_mb = memory_kb / 1024
+
+            print(
+                f"[PROC] {name:<25} "
+                f"PID: {pid:<8} "
+                f"RAM: {memory_mb:.1f} MB"
         
+            )
+        parts = command.split(maxsplit=1)
+        
+        if len(parts) == 1:
+            print("[+] TOP 10 RAM PROCESSES")
+            print("-" * 60)
+
+            for name, pid, memory_kb in processes[:10]:
+                memory_mb = memory_kb / 1024
+                print(f"[PROC] {name:<25} PID: {pid:<8} RAM: {memory_mb:.1f} MB")
+
+        elif parts[1] == "all":
+            print("[+] ALL PROCESSES")
+            print("-" * 60)
+
+            for name, pid, memory_kb in processes:
+                memory_mb = memory_kb / 1024
+                print(f"[PROC] {name:<25} PID: {pid:<8} RAM: {memory_mb:.1f} MB")
+
+        else:
+            search_name = parts[1]
+
+            print(f"[+] SEARCHING FOR: {search_name}")
+            print("-" * 60)
+
+            found = False
+
+            for name, pid, memory_kb in processes:
+                if search_name in name.lower():
+                    memory_mb = memory_kb / 1024
+                    print(f"[FOUND] {name:<25} PID: {pid:<8} RAM: {memory_mb:.1f} MB")
+                    found = True
+
+            if not found:
+                print("[!] PROCESS NOT FOUND")
+
+            print("-" * 60)  
      
-       
+      
+
+
+      
     elif command == "about":
         print("DEDSEC TERMINAL v0.1")
         print("Created by " + alias + ".")
         print("johnny:online")
         print("setname") 
         
-    if command == "setname":
+    elif command == "setname":
         username = input("enter username: ")
         
         user_file = open("user.txt", "w")
         user_file.write(username)
         user_file.close()
     
-        
-    elif command == "show username":
-        print(username)
-        
-        
-    elif command == "setname":
-        username = input("enter username: ")
-        print("show username")
-        print("change username")
-        
-        
-        
-    elif command == "show username":
-        print(" " +alias+".")
+    elif command == "showname":
+        print(username)   
+     
         
     
     
@@ -180,7 +267,7 @@ while True:
         print("select default - use DEFAULT")
         
     elif command == "change art":
-        art = r"""                                                                                                                                                             ,,:,,,_:,,::,:,,::,::::::`:`       `                          _c#<oY8sss__
+        art = r"""          
                                                                                                                                                                              ,,:,,,,::,::::,:,,:::,:,:.:.'      -               - ` --css8&&8s=        
                                                                                                                                                                          `   .,,::::::,,:,:,::::::,',,::`:.      `       -     .``-.`:====c:-----` --..-
                                                                                                                                                                          ` `.:,:,::':::,.::':::''::',,,,^`...`-        -=sss,.::::::,,,:::::,:,::::::'::
